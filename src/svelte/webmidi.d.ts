@@ -12,7 +12,14 @@ declare module "webmidi" {
     id: string;
     name: string;
     manufacturer: string;
-    addListener(type: string, callback: (e: NoteEvent) => void): void;
+    addListener(
+      type: "noteon" | "noteoff",
+      callback: (e: NoteEvent) => void
+    ): void;
+    addListener(
+      type: "controlchange",
+      callback: (e: ControlChangeEvent) => void
+    ): void;
     removeListener(type?: string, callback?: Function): void;
   }
 
@@ -30,5 +37,18 @@ declare module "webmidi" {
     };
     velocity: number;
     rawVelocity: number;
+  }
+
+  export interface ControlChangeEvent {
+    controller: {
+      number: number;
+      name?: string;
+    };
+    value: number;
+    rawValue: number;
+    channel: number;
+    type: string;
+    target: Input;
+    timestamp: number;
   }
 }

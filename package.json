@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "webmidi": "^3.1.6",
-    "@tonaljs/tonal": "^4.6.5"
+    "@tonaljs/tonal": "^4.6.5",
+    "pdfjs-dist": "^3.4.120"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
@@ -30,5 +31,23 @@
     "svelte-preprocess": "^5.0.0",
     "tslib": "^2.5.0",
     "typescript": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.midi.visualizer",
+    "productName": "MIDI Workstation",
+    "files": [
+      "dist/**/*",
+      "public/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Audio"
+    }
   }
 }

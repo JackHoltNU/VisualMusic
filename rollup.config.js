@@ -64,4 +64,27 @@ const electronBundle = {
   external: ["electron", "child_process", "fs", "path", "url", "module", "os"],
 };
 
-module.exports = [mainBundle, electronBundle];
+// Electron preload script bundle
+const preloadBundle = {
+  input: "src/electron/preload.ts",
+  output: {
+    sourcemap: true,
+    format: "cjs",
+    name: "preload",
+    file: "dist/electron/preload.js",
+  },
+  plugins: [
+    resolve({
+      browser: false,
+    }),
+    commonjs(),
+    typescript({
+      sourceMap: !production,
+      inlineSources: !production,
+    }),
+    production && terser(),
+  ],
+  external: ["electron", "path"],
+};
+
+module.exports = [mainBundle, electronBundle, preloadBundle];
