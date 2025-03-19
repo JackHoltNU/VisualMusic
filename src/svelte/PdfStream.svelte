@@ -11,6 +11,10 @@
     let selectedPdf: { path: string; name: string } | null = null;
     let viewerComponent: PdfViewer;
     let showSelector: boolean = true;
+    let viewerSettings = {
+      pagesPerView: 1,
+      isFullscreen: false
+    };
     
     // Handle file selection
     function handlePdfSelect(event: CustomEvent) {
@@ -72,6 +76,7 @@
       padding: 10px 15px;
       background-color: #333;
       border-bottom: 1px solid #444;
+      z-index: 10;
     }
     
     h2 {
@@ -89,6 +94,10 @@
     .file-name {
       font-weight: bold;
       color: #ccc;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     
     .change-button {
@@ -108,6 +117,5 @@
     .content {
       flex: 1;
       overflow: hidden;
-      padding: 15px;
     }
   </style>
