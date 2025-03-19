@@ -12,7 +12,7 @@
   "dependencies": {
     "webmidi": "^3.1.6",
     "@tonaljs/tonal": "^4.6.5",
-    "pdfjs-dist": "^3.4.120"
+    "pdfjs-dist": "^4.2.67"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
