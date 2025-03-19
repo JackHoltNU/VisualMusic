@@ -133,26 +133,17 @@ midi-workstation/
 - `npm start`: Build and start the Electron app
 - `npm run package`: Create standalone executables
 
-## Roadmap
+## Future Enhancements
 
-- [ ] More synthesizer presets and controls
-- [ ] Metronome functionality
-- [ ] MIDI recording and playback
-- [ ] Support for more sheet music formats (MusicXML, etc.)
-- [ ] Audio input for pitch recognition
-- [ ] Touch screen optimizations for Raspberry Pi
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- Advanced chord progression analysis
+- Note visualization options (piano roll, staff notation)
+- Recording and playback functionality
+- Export options for analysis data
+- Audio synthesis for the virtual piano
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+[MIT License](LICENSE)
 
 ## Acknowledgments
 
