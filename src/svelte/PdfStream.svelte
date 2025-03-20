@@ -1,8 +1,9 @@
 <!-- src/svelte/PdfStream.svelte -->
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import PdfViewer from './PdfViewer.svelte';
     import PdfSelector from './PdfSelector.svelte';
+    import { getControllerService } from './services/ControllerService';
     
     // Props
     export let midiInputId: string = '';
@@ -15,6 +16,9 @@
       pagesPerView: 1,
       isFullscreen: false
     };
+    
+    // Controller service
+    let controllerService = getControllerService();
     
     // Handle file selection
     function handlePdfSelect(event: CustomEvent) {
@@ -32,6 +36,34 @@
     function backToSelector() {
       showSelector = true;
     }
+    
+    // Setup controller events
+    function setupControllerEvents() {
+      // Use A button to go back to selector when in viewer
+      controllerService.addEventListener('button_a', () => {
+        if (!showSelector) {
+          backToSelector();
+        }
+      });
+      
+      // Use B button to select a PDF when in selector
+      controllerService.addEventListener('button_b', () => {
+        if (showSelector) {
+          // This is a bit tricky - we can't directly select a file with the controller
+          // But we'll add keyboard accessibility hint in the UI
+        }
+      });
+    }
+    
+    onMount(() => {
+      setupControllerEvents();
+    });
+    
+    onDestroy(() => {
+      // Clean up controller events
+      controllerService.removeEventListener('button_a', () => {});
+      controllerService.removeEventListener('button_b', () => {});
+    });
   </script>
   
   <div class="pdf-stream">
@@ -41,7 +73,7 @@
         <div class="current-file">
           <span class="file-name">{selectedPdf.name}</span>
           <button class="change-button" on:click={backToSelector}>
-            Change File
+            Change File {controllerService.isConnected ? '(A)' : ''}
           </button>
         </div>
       {/if}

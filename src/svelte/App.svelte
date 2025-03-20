@@ -7,6 +7,7 @@
   import MusicAnalysis from './MusicAnalysis.svelte';
   import PdfStream from './PdfStream.svelte';
   import SynthModule from './SynthModule.svelte';
+  import { getControllerService, type GamepadEventType } from './services/ControllerService';
   import { MusicTheoryService, type NoteData, type KeySignatureInfo, type IntervalInfo, type ChordInfo } from './services/MusicTheoryService';
   
   // Enum for stream types
@@ -25,6 +26,7 @@
   let useFallbackPiano: boolean = false;
   let currentStream: StreamType = StreamType.Visualization;
   let isBluetoothControllerConnected: boolean = false;
+  let controllerService = getControllerService();
   
   // Music theory analysis
   const musicService = new MusicTheoryService();
@@ -196,6 +198,44 @@
       status = 'Failed to connect to controller';
     }
   }
+
+  function setupControllerEvents() {
+  // Use L and R buttons to switch between streams
+  controllerService.addEventListener('button_l1', () => {
+    // Move to previous stream
+    if (currentStream === StreamType.Visualization) {
+      selectStream(StreamType.Synthesizer);
+    } else if (currentStream === StreamType.PdfDisplay) {
+      selectStream(StreamType.Visualization);
+    } else if (currentStream === StreamType.Synthesizer) {
+      selectStream(StreamType.PdfDisplay);
+    }
+  });
+  
+  controllerService.addEventListener('button_r1', () => {
+    // Move to next stream
+    if (currentStream === StreamType.Visualization) {
+      selectStream(StreamType.PdfDisplay);
+    } else if (currentStream === StreamType.PdfDisplay) {
+      selectStream(StreamType.Synthesizer);
+    } else if (currentStream === StreamType.Synthesizer) {
+      selectStream(StreamType.Visualization);
+    }
+  });
+  
+  // Direct selection with number buttons (could use X, Y, B buttons for example)
+  controllerService.addEventListener('button_x', () => {
+    selectStream(StreamType.Visualization);
+  });
+  
+  controllerService.addEventListener('button_y', () => {
+    selectStream(StreamType.PdfDisplay);
+  });
+  
+  controllerService.addEventListener('button_a', () => {
+    selectStream(StreamType.Synthesizer);
+  });
+}
   
   // Lifecycle
   onMount(async () => {
@@ -218,6 +258,8 @@
       
       // Setup keyboard navigation for streams (simulating controller)
       document.addEventListener('keydown', handleKeyboardNavigation);
+
+      setupBluetoothController();
       
     } catch (err) {
       status = `WebMidi could not be enabled: ${err}. Using virtual piano.`;
@@ -226,6 +268,40 @@
       // Still need animation frame
       animationFrame = requestAnimationFrame(updateFadingNotes);
     }
+
+    function setupBluetoothController() {
+  try {
+    // Check if controller is already connected
+    if (controllerService.isConnected) {
+      isBluetoothControllerConnected = true;
+      status = 'Connected to 8BitDo controller';
+      
+      // Set up controller events
+      setupControllerEvents();
+      return;
+    }
+    
+    // Otherwise simulate looking for controller
+    status = 'Searching for 8BitDo controller...';
+    
+    // Simulate delay
+    setTimeout(() => {
+      // Even if we don't find a physical controller, we can still set up events
+      // which will work as soon as controller is connected
+      setupControllerEvents();
+      
+      // Check again if controller is connected after delay
+      isBluetoothControllerConnected = controllerService.isConnected;
+      status = isBluetoothControllerConnected ? 
+        'Connected to 8BitDo controller' : 
+        'No controller found. Connect controller and refresh.';
+    }, 1500);
+    
+  } catch (error) {
+    console.error('Error connecting to Bluetooth controller:', error);
+    status = 'Failed to connect to controller';
+  }
+}
   });
   
   onDestroy(() => {
@@ -239,6 +315,7 @@
       WebMidi.inputs.forEach(input => {
         input.removeListener();
       });
+      cleanupControllerEvents();
     } catch (error) {
       console.log('Error during MIDI cleanup:', error);
     }
@@ -298,6 +375,17 @@
       selectStream(StreamType.Synthesizer);
     }
   }
+
+  function cleanupControllerEvents() {
+  const events: GamepadEventType[] = [
+    'button_l1', 'button_r1', 
+    'button_x', 'button_y', 'button_a'
+  ];
+  
+  events.forEach(event => {
+    controllerService.removeEventListener(event, () => {});
+  });
+}
 </script>
 
 <main>

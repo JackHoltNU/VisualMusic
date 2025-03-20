@@ -3,6 +3,7 @@
     import { onMount, onDestroy, createEventDispatcher } from 'svelte';
     import { WebMidi } from 'webmidi';
     import type { Input } from 'webmidi';
+    import { getControllerService, type GamepadEventType } from './services/ControllerService';
     
     // PDF.js library for rendering PDFs
     let pdfjs: any;
@@ -25,6 +26,7 @@
     let pagesPerView: number = 1;
     let renderedPages: number[] = [];
     let canvasContainer: HTMLDivElement;
+    let controllerService = getControllerService();
     
     const dispatch = createEventDispatcher();
     
@@ -59,6 +61,9 @@
         // Listen for fullscreen change events
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         
+        // Setup controller events
+        setupControllerEvents();
+        
       } catch (error: any) {
         status = `Error initializing PDF viewer: ${error.message}`;
         console.error('PDF viewer initialization error:', error);
@@ -80,6 +85,9 @@
           console.error('Error exiting fullscreen:', err);
         });
       }
+      
+      // Clean up controller events
+      cleanupControllerEvents();
     });
     
     // Handle fullscreen changes from browser
@@ -390,6 +398,57 @@
       }
     }
     
+    // Setup controller events
+    function setupControllerEvents() {
+      // Navigation
+      controllerService.addEventListener('dpad_left', () => prevPage());
+      controllerService.addEventListener('dpad_right', () => nextPage());
+      
+      // Go to first/last page
+      controllerService.addEventListener('dpad_up', () => {
+        pageNum = 1;
+        queueRenderPages(pageNum);
+      });
+      
+      controllerService.addEventListener('dpad_down', () => {
+        pageNum = Math.max(1, pageCount - pagesPerView + 1);
+        queueRenderPages(pageNum);
+      });
+      
+      // Zoom controls
+      controllerService.addEventListener('button_plus', () => zoomIn());
+      controllerService.addEventListener('button_minus', () => zoomOut());
+      
+      // Select/back - B button is select, A button is back
+      controllerService.addEventListener('button_b', () => toggleFullscreen());
+      
+      // L and R triggers for quick navigation by larger steps
+      controllerService.addEventListener('button_l1', () => {
+        const jumpSize = 5 * pagesPerView;
+        pageNum = Math.max(1, pageNum - jumpSize);
+        queueRenderPages(pageNum);
+      });
+      
+      controllerService.addEventListener('button_r1', () => {
+        const jumpSize = 5 * pagesPerView;
+        pageNum = Math.min(pageCount - pagesPerView + 1, pageNum + jumpSize);
+        queueRenderPages(pageNum);
+      });
+    }
+    
+    // Clean up controller events
+    function cleanupControllerEvents() {
+      const events: GamepadEventType[] = [
+        'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right',
+        'button_a', 'button_b', 'button_plus', 'button_minus',
+        'button_l1', 'button_r1'
+      ];
+      
+      events.forEach(event => {
+        controllerService.removeEventListener(event, () => {});
+      });
+    }
+    
     // Expose functions to parent component
     export function openPdf(path: string) {
       loadPdf(path);
@@ -486,7 +545,13 @@
     </div>
     
     <div class="instructions" class:hidden={isFullscreen}>
-      <p>Press the middle pedal to turn to the next page. Press ESC to exit fullscreen mode.</p>
+      <p>
+        Press the middle pedal to turn to the next page. Press ESC to exit fullscreen mode.
+        {#if controllerService.isConnected}
+          <br>
+          <strong>Controller:</strong> D-Pad to navigate, +/- to zoom, B to toggle fullscreen
+        {/if}
+      </p>
     </div>
   </div>
   
