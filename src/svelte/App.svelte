@@ -343,30 +343,10 @@
     }
     
     // Prevent default behavior for these keys
-    event.preventDefault();
+    event.preventDefault();    
     
-    // Handle stream switching
-    if (event.key === 'ArrowLeft') {
-      // Move to previous stream
-      if (currentStream === StreamType.Visualization) {
-        selectStream(StreamType.Synthesizer);
-      } else if (currentStream === StreamType.PdfDisplay) {
-        selectStream(StreamType.Visualization);
-      } else if (currentStream === StreamType.Synthesizer) {
-        selectStream(StreamType.PdfDisplay);
-      }
-    } else if (event.key === 'ArrowRight') {
-      // Move to next stream
-      if (currentStream === StreamType.Visualization) {
-        selectStream(StreamType.PdfDisplay);
-      } else if (currentStream === StreamType.PdfDisplay) {
-        selectStream(StreamType.Synthesizer);
-      } else if (currentStream === StreamType.Synthesizer) {
-        selectStream(StreamType.Visualization);
-      }
-    }
     // Direct selection
-    else if (event.key === '1') {
+    if (event.key === '1') {
       selectStream(StreamType.Visualization);
     } else if (event.key === '2') {
       selectStream(StreamType.PdfDisplay);
@@ -494,16 +474,8 @@
       <div class="stream-content synth-stream">
         <SynthModule midiInputId={selectedInputId} />
       </div>
-    {/if}
+    {/if}   
     
-    <div class="navigation-help">
-      <p>
-        Use left/right arrow keys to switch between streams, or press 1, 2, 3 to select a specific stream.
-        {#if isBluetoothControllerConnected}
-          You can also use your 8BitDo controller to navigate.
-        {/if}
-      </p>
-    </div>
   </div>
 </main>
 
