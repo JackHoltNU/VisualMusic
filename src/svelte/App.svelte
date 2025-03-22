@@ -81,6 +81,8 @@
     input.addListener('noteon', e => {
       const noteId = `${e.note.number}`;
       const noteName = e.note.name + e.note.octave;
+      console.log(`noteId: ${noteId}`);
+      console.log(`noteEvent: ${e.note}`);
       
       activeNotes.set(noteId, {
         id: noteId,
