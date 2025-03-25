@@ -368,16 +368,19 @@
           // Common values are 4, 66, and 67 (depending on the MIDI device)
           if (e.controller.number === 4 || e.controller.number === 66 || e.controller.number === 67) {
             // If pedal is pressed (value > 64 in most cases)
-            if (e.value > 64) {
-              console.log('Middle pedal detected, turning page');
+            if (typeof e.value == "number" && e.value > 64) {
+              console.log('Middle pedal detected via number, turning page');
               nextPage();
-            } 
-            // Some pedals might use the release for page turning instead
-            else if (e.value < 32) {
-              console.log('Middle pedal released');
-              // Uncomment this if you want page turning on release
-              // prevPage();
+            } else if (typeof e.value == "boolean" && e.value){
+              console.log('Middle pedal detected via bool, turning page');
+              nextPage();
             }
+            // Some pedals might use the release for page turning instead
+            // else if (e.value < 32) {
+            //   console.log('Middle pedal released');
+            //   // Uncomment this if you want page turning on release
+            //   // prevPage();
+            // }
           }
         });
         

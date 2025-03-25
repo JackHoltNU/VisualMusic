@@ -98,7 +98,7 @@
         // Note On handler
         input.addListener('noteon', e => {
           const note = e.note.number;
-          const velocity = e.velocity;
+          const velocity = e.note.attack;
           
           // Apply octave shift
           const shiftedNote = note + (octaveShift * 12);
