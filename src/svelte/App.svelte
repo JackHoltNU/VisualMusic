@@ -9,6 +9,7 @@
   import SynthModule from './SynthModule.svelte';
   import { getControllerService, type GamepadEventType } from './services/ControllerService';
   import { MusicTheoryService, type NoteData, type KeySignatureInfo, type IntervalInfo, type ChordInfo } from './services/MusicTheoryService';
+  import NoteVisualization from './NoteVisualization.svelte';
   
   // Enum for stream types
   enum StreamType {
@@ -456,6 +457,13 @@
               />
             {/each}
           </div>
+          <div class="visualization-panel">
+            <h3>Artistic Visualization</h3>
+            <NoteVisualization
+              notes={notesArray}
+              intervals={intervals}
+            />
+          </div>
           
           <MusicAnalysis 
             musicService={musicService} 
@@ -647,4 +655,19 @@
     color: #ccc;
     text-align: center;
   }
+  .visualization-panel {
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.visualization-panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #ddd;
+}
 </style>
