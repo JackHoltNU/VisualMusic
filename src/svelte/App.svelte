@@ -80,7 +80,7 @@
     // Listen for note on events
     input.addListener('noteon', e => {
       const noteId = `${e.note.number}`;
-      const noteName = e.note.name + e.note.octave;
+      const noteName = e.note.name + (e.note.accidental || '') + e.note.octave;;
       console.log(`noteId: ${noteId}`);
       console.log(`noteEvent: ${e.note}`);
       
@@ -88,7 +88,7 @@
         id: noteId,
         name: noteName,
         midiNumber: e.note.number,
-        velocity: e.velocity,
+        velocity: e.note.attack,
         timestamp: Date.now(),
         inKey: true, // Default value, will be updated in updateNotesArray
         active: true
