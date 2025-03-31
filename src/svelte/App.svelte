@@ -10,6 +10,7 @@
   import { getControllerService, type GamepadEventType } from './services/ControllerService';
   import { MusicTheoryService, type NoteData, type KeySignatureInfo, type IntervalInfo, type ChordInfo } from './services/MusicTheoryService';
   import NoteVisualization from './NoteVisualization.svelte';
+  import TonalVisualization from './TonalVisualization.svelte';
   
   // Enum for stream types
   enum StreamType {
@@ -28,6 +29,7 @@
   let currentStream: StreamType = StreamType.Visualization;
   let isBluetoothControllerConnected: boolean = false;
   let controllerService = getControllerService();
+  let maximizedVisualization: string | null = null;
   
   // Music theory analysis
   const musicService = new MusicTheoryService();
@@ -154,6 +156,20 @@
       }
     }
   }
+
+  function handleVisualizationMaximize(event: CustomEvent) {
+  const { isMaximized, vizId } = event.detail;
+  
+  // If maximizing, set the maximized component, otherwise clear it
+  maximizedVisualization = isMaximized ? vizId : null;
+  
+  // Update the main content layout based on maximized state
+  if (isMaximized) {
+    document.body.style.overflow = 'hidden'; // Prevent scrolling behind the maximized viz
+  } else {
+    document.body.style.overflow = ''; // Restore scrolling
+  }
+}
   
   // Animation frame for note fading
   let animationFrame: number;
@@ -458,6 +474,19 @@
             {/each}
           </div>
           <div class="visualization-panel">
+            style={maximizedVisualization && maximizedVisualization !== 'tonal-viz' ? 'display: none;' : ''}>
+            <h3>Music Theory Visualization</h3>
+            <TonalVisualization
+              notes={notesArray}
+              intervals={intervals}
+              chords={chords}
+              currentKey={currentKey}
+              fadeDurationOption="5" 
+              vizId="tonal-viz"
+              on:toggleMaximize={handleVisualizationMaximize}
+            />
+          </div>
+          <div class="visualization-panel">
             <h3>Artistic Visualization</h3>
             <NoteVisualization
               notes={notesArray}
@@ -624,7 +653,7 @@
     flex-direction: column;
     flex: 1;
     gap: 20px;
-    overflow: hidden;
+    overflow: auto;
   }
   
   .notes-container {
